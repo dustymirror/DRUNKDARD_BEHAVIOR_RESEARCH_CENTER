@@ -215,7 +215,9 @@ The OLED also uses edge ghosting to make these transitions easier to perceive.
 
 ## Counterpoint
 
-Counterpoint introduces a stronger relationship between the two agents.
+Counterpoint mode introduces a stronger relationship between the two agents.
+
+This mode originates from the author’s first written score, XTS0001 —— a piece in which two performers attempt to execute mirror-image movements in a symmetrical space, relying solely on their sense of hearing. At a slightly faster tempo, it tends to lose the beat quite a bit, so it’s rather lazy.
 
 The agents influence each other while maintaining independent movement.
 
@@ -286,10 +288,10 @@ Quantization affects the **CV output**, not the underlying behavioral position.
 Available modes:
 
 ```text
-0   Continuous
-1   12
-2   7
-3   5
+0   0 Continuous
+1   12 semitone
+2   7 seven-tone
+3   5 pentatonic
 4   M1
 5   M2
 6   M3
@@ -727,7 +729,8 @@ OLED 同时使用边缘残影，使这种穿越更容易被观察。
 ## Counterpoint — 对位
 
 Counterpoint 为两个对象建立更强的行为关系。
-
+“对位法”模式来自作者的首个文字谱作品XTS0001。
+这是一个由两名表演者在仅依靠听觉的情况下尝试在对称空间中进行镜像运动的作品。
 它们相互影响，但仍然保持各自独立的运动。
 
 目标是：
