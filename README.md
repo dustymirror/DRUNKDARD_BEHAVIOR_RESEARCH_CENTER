@@ -292,7 +292,7 @@ Available modes:
 1   12 semitone
 2   7 seven-tone
 3   5 pentatonic
-4   M1
+4   M1 whole-tone
 5   M2
 6   M3
 7   M4
@@ -301,7 +301,7 @@ Available modes:
 10  M7
 ```
 
-The M1–M7 options are the seven **Messiaen modes of limited transposition**.
+The M1–M7 options are the seven ** Olivier Messiaen‘s modes of limited transposition**.
 
 ### M1
 
@@ -804,11 +804,11 @@ X 输出的全局范围可以设置为：
 可选：
 
 ```text
-0   Continuous
-1   12
-2   7
-3   5
-4   M1
+0   0 连续电压
+1   12 半音阶
+2   7 七声
+3   5 五声
+4   M1 全音阶
 5   M2
 6   M3
 7   M4
@@ -817,7 +817,7 @@ X 输出的全局范围可以设置为：
 10  M7
 ```
 
-M1–M7 对应 **Messiaen 的七种有限移调模式**。
+M1–M7 对应 **Olivier Messiaen 的七种有限移调模式**。
 
 ### M1
 
