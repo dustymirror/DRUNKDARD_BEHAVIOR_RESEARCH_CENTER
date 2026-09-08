@@ -3,7 +3,10 @@
 </p>
 
 
-**[中文说明 (Chinese)](#-中文说明)**
+
+[跳转到中文说明](#chinese)
+
+
 
 # Drunkard Behavior Research Center
 
