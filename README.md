@@ -1,3 +1,10 @@
+<p align="center">
+  <img src="[https://github.com/dustymirror/DRUNKDARD_BEHAVIOR_RESEARCH_CENTER/blob/main/ba.jpg" alt="BA" width="400">
+</p>
+
+
+
+
 **[中文说明 (Chinese)](#-中文说明)**
 
 # Drunkard Behavior Research Center
