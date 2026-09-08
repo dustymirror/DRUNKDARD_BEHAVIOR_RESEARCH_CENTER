@@ -103,6 +103,8 @@ Parameters that belong to an individual agent are edited for the selected agent.
 
 ## B2 — Parameter Page
 
+（Parameter page will automatically hide after 15 seconds if no knobs or buttons are operated; turn any knob to bring the page back.）
+
 Press **B2** to cycle through the parameter pages.
 
 ```text
@@ -615,6 +617,8 @@ B — Ben
 ---
 
 ## B2 — 参数页面
+
+（参数页面在没有旋钮和按钮控制15秒的情况下会自动隐藏，旋转任意旋钮来唤醒页面。）
 
 按下 **B2**，依次切换：
 
