@@ -499,7 +499,8 @@ Built for the open-source **EuroPi** platform by Allen Synthesis.
 
 ---
 
-##  中文说明
+<a id="chinese"></a>
+## 中文说明
 
 
 # 醉汉行为研究中心
