@@ -2,8 +2,6 @@
   <img src="https://raw.githubusercontent.com/dustymirror/DRUNKDARD_BEHAVIOR_RESEARCH_CENTER/refs/heads/main/ba.jpg" alt="DRUNKDARD Research Center" width="400">
 </p>
 
-# Lazy Drummer
-
 
 **[中文说明 (Chinese)](#-中文说明)**
 
