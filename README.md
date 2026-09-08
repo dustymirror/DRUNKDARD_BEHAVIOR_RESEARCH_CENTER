@@ -1,3 +1,5 @@
+**[中文说明 (Chinese)](#-中文说明)**
+
 # Drunkard Behavior Research Center
 
 ### An experimental behavioral CV instrument for EuroPi
@@ -432,62 +434,7 @@ The program can then be launched from the EuroPi Menu.
 
 ---
 
-# 13. Running from the EuroPi Menu
-
-Typical workflow:
-
-```text
-Power On
-   ↓
-EuroPi Menu
-   ↓
-DRUNKARD
-   ↓
-Run
-```
-
-The EuroPi Menu / Bootloader is responsible for instantiating the selected script.
-
-The script may also contain the standard Python entry point:
-
-```python
-if __name__ == "__main__":
-    Drunkard().main()
-```
-
-This allows the program to be executed directly during development.
-
-When imported by the EuroPi Menu, the `__main__` condition is not normally executed; the Menu launches the script itself.
-
----
-
-# 14. Development
-
-The program can also be developed and tested using **Thonny**.
-
-A useful workflow is:
-
-```text
-Edit
- ↓
-Save
- ↓
-Run
- ↓
-Observe OLED
- ↓
-Listen to CV
- ↓
-Change one parameter
- ↓
-Repeat
-```
-
-Because the system is stateful and several parameters interact with one another, changing one parameter at a time makes behavioral differences easier to understand.
-
----
-
-# 15. Design Philosophy
+# 13. Design Philosophy
 
 Drunkard Behavior Research Center is intentionally not optimized for stability.
 
@@ -509,7 +456,7 @@ The goal is not to eliminate irregularity, but to make irregularity **structural
 
 ---
 
-# 16. Project Status
+# 14. Project Status
 
 **Experimental / Research Instrument**
 
@@ -527,7 +474,7 @@ Possible future directions include additional agents, environmental fields, obst
 
 ---
 
-# 17. Credits
+# 15. Credits
 
 **Drunkard Behavior Research Center**
 
@@ -546,6 +493,9 @@ Built for the open-source **EuroPi** platform by Allen Synthesis.
 > **A small behavioral system that happens to make voltage.**
 
 ---
+
+##  中文说明
+
 
 # 醉汉行为研究中心
 
@@ -996,62 +946,7 @@ lib/
 
 ---
 
-# 13. 从 EuroPi Menu 运行
-
-基本流程：
-
-```text
-开机
- ↓
-EuroPi Menu
- ↓
-DRUNKARD
- ↓
-Run
-```
-
-EuroPi Menu / Bootloader 负责实例化和启动被选择的程序。
-
-程序本身也可以保留标准 Python 入口：
-
-```python
-if __name__ == "__main__":
-    Drunkard().main()
-```
-
-这样在开发过程中也可以直接运行程序。
-
-当程序由 EuroPi Menu 以模块形式加载时，`__main__` 条件通常不会执行，而是由 Menu 自己启动程序。
-
----
-
-# 14. 开发
-
-程序也可以通过 **Thonny** 进行开发和测试。
-
-推荐流程：
-
-```text
-编辑
- ↓
-保存
- ↓
-运行
- ↓
-观察 OLED
- ↓
-监听 CV
- ↓
-修改一个参数
- ↓
-重复
-```
-
-由于这是一个具有状态的行为系统，并且不同参数之间存在相互作用，因此一次只修改一个参数，更容易理解行为变化的来源。
-
----
-
-# 15. 设计理念
+# 13. 设计理念
 
 Drunkard Behavior Research Center 并不以稳定为目标。
 
@@ -1075,7 +970,7 @@ Drunkard Behavior Research Center 并不以稳定为目标。
 
 ---
 
-# 16. 项目状态
+# 14. 项目状态
 
 **Experimental / Research Instrument**
 
@@ -1101,7 +996,7 @@ Drunkard Behavior Research Center 并不以稳定为目标。
 
 ---
 
-# 17. 作者
+# 15. 作者
 
 **Drunkard Behavior Research Center**
 
