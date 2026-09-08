@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="[[https://github.com/dustymirror/DRUNKDARD_BEHAVIOR_RESEARCH_CENTER/blob/main/ba.jpg]" alt="BA" width="400">
+  <img src="[https://raw.githubusercontent.com/dustymirror/DRUNKDARD_BEHAVIOR_RESEARCH_CENTER/refs/heads/main/ba.jpg]" alt="BA" width="400">
 </p>
 
 
