@@ -519,7 +519,7 @@ Built for the open-source **EuroPi** platform by Allen Synthesis.
 
 
 # 醉鬼行为研究中心
-> **一个恰好会产生电压的小型行为系统。**
+> **一个恰好会产生电压的小型行为系统:P**
 
 ### 一个为 EuroPi 制作的实验性CV发生器
 
