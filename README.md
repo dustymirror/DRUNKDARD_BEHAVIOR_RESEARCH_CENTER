@@ -500,7 +500,7 @@ Possible future directions include additional agents, environmental fields, obst
 
 Concept, design and implementation:
 
-**Xu Cheng / 徐程**
+**Xu Cheng / 徐程 / Dusty Mirror**
 
 Developed as an experimental instrument for Eurorack, generative sound and behavioral systems.
 
@@ -1026,7 +1026,7 @@ Drunkard Behavior Research Center 并不以稳定为目标。
 
 概念、设计与程序：
 
-**徐程 / Xu Cheng**
+**徐程 / Xu Cheng / Dusty Mirror**
 
 作为一个实验性 Eurorack 乐器，用于生成式声音、行为系统以及视觉—声音关系的研究。
 
