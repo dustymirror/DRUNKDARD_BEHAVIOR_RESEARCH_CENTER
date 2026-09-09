@@ -10,7 +10,9 @@
 
 # Drunkard Behavior Research Center
 
-### An experimental behavioral CV instrument for EuroPi
+> **A small behavioral system that happens to make voltage ；）**
+
+### An experimental CV instrument for EuroPi
 
 **Drunkard Behavior Research Center** is an experimental generative CV instrument for **EuroPi**.
 
@@ -123,6 +125,8 @@ The parameter controls use **pickup behavior**.
 
 When changing pages, a physical knob does not immediately jump to the stored parameter value.
 
+If the knob position does not correspond to a Pickup parameter, the parameter will be marked with an asterisk (*). 
+
 The knob must first cross the stored value before taking control.
 
 This prevents unexpected parameter jumps when moving between pages.
@@ -165,7 +169,7 @@ Controls the interaction between Alice and Ben.
 
 A low Link value keeps their behavior relatively independent.
 
-Higher values make their movements increasingly related.
+Higher values make their movements increasingly related. For example, collisions and interaction behaviors.
 
 The current preferred working value is approximately:
 
@@ -219,7 +223,7 @@ The OLED also uses edge ghosting to make these transitions easier to perceive.
 
 Counterpoint mode introduces a stronger relationship between the two agents.
 
-This mode originates from the author’s first written score, XTS0001 —— a piece in which two performers attempt to execute mirror-image movements in a symmetrical space, relying solely on their sense of hearing. At a slightly faster tempo, it tends to lose the beat quite a bit, so it’s rather lazy.
+This mode originates from the author’s first event score piece, XTS0001 —— a piece in which two performers attempt to execute mirror-image movements in a symmetrical space, relying solely on their sense of hearing. 
 
 The agents influence each other while maintaining independent movement.
 
@@ -285,15 +289,17 @@ The X output range can be selected globally from:
 
 # 8. Quantization
 
+Global control of Alice and Ben’s position CV outputs for musical quantisation.
+
 Quantization affects the **CV output**, not the underlying behavioral position.
 
 Available modes:
 
 ```text
-0   0 Continuous
+0   0  Continuous
 1   12 semitone
-2   7 seven-tone
-3   5 pentatonic
+2   7  seven-tone
+3   5  pentatonic
 4   M1 whole-tone
 5   M2
 6   M3
@@ -303,7 +309,7 @@ Available modes:
 10  M7
 ```
 
-The M1–M7 options are the seven ** Olivier Messiaen‘s modes of limited transposition**.
+The M1–M7 options are ** Olivier Messiaen‘s 7 modes of limited transposition**.
 
 ### M1
 
@@ -353,7 +359,9 @@ Quantization provides a musical interpretation of the same underlying behavioral
 
 # 9. Rise / Fall
 
-Rise and Fall provide independent smoothing for the CV outputs.
+Rise and Fall provide independent slew for the CV outputs.
+
+> **The default value is no slew; the smaller the value, the greater the slew.**
 
 Current mapping:
 
@@ -511,8 +519,9 @@ Built for the open-source **EuroPi** platform by Allen Synthesis.
 
 
 # 醉鬼行为研究中心
+> **一个恰好会产生电压的小型行为系统。**
 
-### 一个为 EuroPi 制作的实验性行为 CV 乐器
+### 一个为 EuroPi 制作的实验性CV发生器
 
 **Drunkard Behavior Research Center（醉鬼行为研究中心）** 是一个运行于 **EuroPi** 上的实验性生成式 CV 乐器。
 
@@ -652,7 +661,7 @@ PAGE 4    X Range
 
 控制当前对象的水平行为范围。
 
-数值越大，对象可以探索的水平空间越大。
+数值越大，对象单步可能探索的水平空间越大。
 
 当前映射：
 
@@ -735,7 +744,7 @@ OLED 同时使用边缘残影，使这种穿越更容易被观察。
 ## Counterpoint — 对位
 
 Counterpoint 为两个对象建立更强的行为关系。
-“对位法”模式来自作者的首个文字谱作品XTS0001。这是一个由两名表演者在仅依靠听觉的情况下尝试在对称空间中进行镜像运动的作品。
+“对位法”模式灵感来自作者的首个文字谱作品XTS0001。这是一个由两名表演者在仅依靠听觉的情况下尝试在对称空间中进行镜像运动的作品。
 它们相互影响，但仍然保持各自独立的运动。
 
 目标是：
@@ -879,7 +888,7 @@ Rise = 0.02 + K1 × 0.48
 Fall = 0.02 + K2 × 0.48
 ```
 
-Slew 位于量化之后：
+Slew 位于量化之后，以表现滑音：
 
 ```text
 Behavior
