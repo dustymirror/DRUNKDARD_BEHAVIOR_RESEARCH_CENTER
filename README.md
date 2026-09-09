@@ -1026,7 +1026,7 @@ Drunkard Behavior Research Center 并不以稳定为目标。
 
 概念、设计与程序：
 
-**徐程 / Xu Cheng / Dusty Mirror**
+**徐程 / Dusty Mirror**
 
 作为一个实验性 Eurorack 乐器，用于生成式声音、行为系统以及视觉—声音关系的研究。
 
