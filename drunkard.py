@@ -1,6 +1,6 @@
 # ============================================================
 # DRUNKARD
-# #908 v1.3
+# #910 v1.4
 # ============================================================
 
 from europi import *
@@ -218,8 +218,8 @@ class Drunkard:
 
         self.mode = MODE_WANDER
 
-        self.rise = 0.15
-        self.fall = 0.15
+        self.rise = 5.00
+        self.fall = 5.00
 
         self.quant = 0
 
@@ -752,23 +752,10 @@ class Drunkard:
 # INIT
 # ============================================================
 
-alice = Drunkard(
-    "A",
-    1.4,
-    0.9
-)
+alice = Drunkard("A", 1.4, 0.9)
+ben   = Drunkard("B", 1.0, 0.7)
 
-ben = Drunkard(
-    "B",
-    1.0,
-    0.7
-)
-
-drunks = [
-    alice,
-    ben
-]
-
+drunks = [alice, ben]
 selected = 0
 
 page = 0
@@ -778,6 +765,11 @@ PAGE_COUNT = 5
 pickup1 = False
 pickup2 = False
 
+pickup_wait1 = True
+pickup_wait2 = True
+
+last_k1 = k1.percent()
+last_k2 = k2.percent()
 
 # ============================================================
 # X RANGE
@@ -837,37 +829,44 @@ combo_start = 0
 # ============================================================
 # BUTTON ACTIONS
 # ============================================================
-
 def next_drunk():
-
     global selected
-    global pickup1
-    global pickup2
+    global pickup1, pickup2
+    global pickup_wait1, pickup_wait2
+    global last_k1, last_k2
     global last_ui_activity
 
-    selected = (
-        selected + 1
-    ) % len(drunks)
+    selected = (selected + 1) % 2
 
     pickup1 = False
     pickup2 = False
+
+    pickup_wait1 = True
+    pickup_wait2 = True
+
+    last_k1 = k1.percent()
+    last_k2 = k2.percent()
 
     last_ui_activity = ticks_ms()
 
 
 def next_page():
-
     global page
-    global pickup1
-    global pickup2
+    global pickup1, pickup2
+    global pickup_wait1, pickup_wait2
+    global last_k1, last_k2
     global last_ui_activity
 
-    page = (
-        page + 1
-    ) % PAGE_COUNT
+    page = (page + 1) % PAGE_COUNT
 
     pickup1 = False
     pickup2 = False
+
+    pickup_wait1 = True
+    pickup_wait2 = True
+
+    last_k1 = k1.percent()
+    last_k2 = k2.percent()
 
     last_ui_activity = ticks_ms()
 
@@ -1344,7 +1343,6 @@ next_step = (
 
 last_frame = ticks_ms()
 
-
 # ============================================================
 # MAIN LOOP
 # ============================================================
@@ -1352,24 +1350,26 @@ last_frame = ticks_ms()
 while True:
 
     now = ticks_ms()
-
-    current = drunks[selected]
-
-
-    # ========================================================
-    # BUTTONS
-    # ========================================================
-
+    
     process_buttons(now)
-
-
-    # ========================================================
-    # CONTROL
-    # ========================================================
+    
+    current = drunks[selected]
 
     k1v = k1.percent()
     k2v = k2.percent()
 
+    # -------------------------
+    # PICKUP ARM
+    # -------------------------
+
+    if abs(k1v - last_k1) > 0.01:
+        pickup_wait1 = False
+
+    if abs(k2v - last_k2) > 0.01:
+        pickup_wait2 = False
+
+    last_k1 = k1v
+    last_k2 = k2v
 
     # --------------------------------------------------------
     # UI activity
@@ -1437,14 +1437,14 @@ while True:
     # PICKUP
     # ========================================================
 
-    if not pickup1:
+    if not pickup1 and not pickup_wait1:
 
         if abs(k1v - p1) < 0.03:
 
             pickup1 = True
 
 
-    if not pickup2:
+    if not pickup2 and not pickup_wait2:
 
         if abs(k2v - p2) < 0.03:
 
@@ -2007,33 +2007,6 @@ while True:
                 ay
             )
 
-
-        if (
-            ax > WIDTH - 4
-            and
-            -8 < ay < HEIGHT
-        ):
-
-            oled.text(
-                "A",
-                ax - WIDTH,
-                ay
-            )
-
-
-        if (
-            ax < 4
-            and
-            -8 < ay < HEIGHT
-        ):
-
-            oled.text(
-                "A",
-                ax + WIDTH,
-                ay
-            )
-
-
         # ----------------------------------------------------
         # B
         # ----------------------------------------------------
@@ -2047,32 +2020,6 @@ while True:
             oled.text(
                 "B",
                 bx,
-                by
-            )
-
-
-        if (
-            bx > WIDTH - 4
-            and
-            -8 < by < HEIGHT
-        ):
-
-            oled.text(
-                "B",
-                bx - WIDTH,
-                by
-            )
-
-
-        if (
-            bx < 4
-            and
-            -8 < by < HEIGHT
-        ):
-
-            oled.text(
-                "B",
-                bx + WIDTH,
                 by
             )
 
