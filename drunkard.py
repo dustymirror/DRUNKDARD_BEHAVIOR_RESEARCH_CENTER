@@ -218,8 +218,8 @@ class Drunkard:
 
         self.mode = MODE_WANDER
 
-        self.rise = 5.00
-        self.fall = 5.00
+        self.rise = 0.15
+        self.fall = 0.15
 
         self.quant = 0
 
