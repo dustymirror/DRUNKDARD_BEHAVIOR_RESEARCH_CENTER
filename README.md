@@ -361,7 +361,7 @@ Quantization provides a musical interpretation of the same underlying behavioral
 
 Rise and Fall provide independent slew for the CV outputs.
 
-> **The default value is no slew; the smaller the value, the greater the slew.**
+> **The default value is 0.15; the smaller the value, the greater the slew.**
 
 Current mapping:
 
@@ -879,7 +879,7 @@ M1–M7 对应 **Olivier Messiaen 的七种有限移调模式**。
 
 Rise / Fall 为 CV 输出提供独立的增量和降量平滑控制。
 
-> **默认值为不平滑，数值越小越平滑**
+> **默认值为0.15，数值越小越平滑**
 
 当前映射：
 
