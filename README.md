@@ -14,6 +14,8 @@
 
 ### An experimental CV instrument for EuroPi
 
+v1.46 updated Sep 13 2026 - Follow Behavior debug 
+
 **Drunkard Behavior Research Center** is an experimental generative CV instrument for **EuroPi**.
 
 Instead of generating random voltages directly, the program creates two virtual agents — **Alice** and **Ben** — and lets them move through a shared two-dimensional space.
