@@ -1,6 +1,6 @@
 # ============================================================
 # DRUNKARD
-# #910 v1.4
+# #910 v1.46
 # ============================================================
 
 from europi import *
@@ -22,7 +22,8 @@ STEP_MAX = 700
 
 FRAME_INTERVAL = 25
 
-EVENT_COOLDOWN = 400
+EVENT_COOLDOWN_MIN = 50
+EVENT_COOLDOWN_MAX = 500
 
 UI_TIMEOUT = 15000
 
@@ -73,22 +74,32 @@ ben_trig = cv6
 
 
 # ============================================================
-# EVENT GATE
+# new EVENT GATE
 # ============================================================
+
+EVENT_COOLDOWN_MIN = 50
+EVENT_COOLDOWN_MAX = 500
+
 
 class EventGate:
 
     def __init__(self):
 
-        self.last_collision = 0
-        self.last_wall_a = 0
-        self.last_wall_b = 0
+        self.next_collision = 0
+        self.next_wall_a = 0
+        self.next_wall_b = 0
 
     def allow_collision(self, now):
 
-        if now - self.last_collision > EVENT_COOLDOWN:
+        if now >= self.next_collision:
 
-            self.last_collision = now
+            self.next_collision = (
+                now +
+                random.randint(
+                    EVENT_COOLDOWN_MIN,
+                    EVENT_COOLDOWN_MAX
+                )
+            )
 
             return True
 
@@ -98,17 +109,29 @@ class EventGate:
 
         if name == "A":
 
-            if now - self.last_wall_a > EVENT_COOLDOWN:
+            if now >= self.next_wall_a:
 
-                self.last_wall_a = now
+                self.next_wall_a = (
+                    now +
+                    random.randint(
+                        EVENT_COOLDOWN_MIN,
+                        EVENT_COOLDOWN_MAX
+                    )
+                )
 
                 return True
 
         else:
 
-            if now - self.last_wall_b > EVENT_COOLDOWN:
+            if now >= self.next_wall_b:
 
-                self.last_wall_b = now
+                self.next_wall_b = (
+                    now +
+                    random.randint(
+                        EVENT_COOLDOWN_MIN,
+                        EVENT_COOLDOWN_MAX
+                    )
+                )
 
                 return True
 
@@ -116,7 +139,6 @@ class EventGate:
 
 
 gate = EventGate()
-
 
 # ============================================================
 # DRUNKARD
@@ -139,6 +161,10 @@ class Drunkard:
             self.ty += other.vy * 3 * self.link
 
             return
+    
+        if self.copy_cooldown > 0:
+
+            self.copy_cooldown -= 1
 
         dx = other.x - self.x
         dy = other.y - self.y
@@ -147,11 +173,16 @@ class Drunkard:
 
         if d < 20:
 
-            if random.random() < 0.03:
+            if (
+                self.copy_cooldown <= 0
+                and
+                random.random() < 0.03
+            ):
 
                 self.copy_timer = random.randint(20, 60)
 
-
+                # 跟随结束后留一点冷却时间
+                self.copy_cooldown = random.randint(40, 120)
     # --------------------------------------------------------
     # INIT
     # --------------------------------------------------------
@@ -206,6 +237,8 @@ class Drunkard:
 
         # copying
         self.copy_timer = 0
+        
+        self.copy_cooldown = 0
 
         # mood
         self.mood = random.random()
@@ -1816,17 +1849,27 @@ while True:
 
         if ui_visible:
 
-            oled.text(
-                "A" if selected == 0 else " ",
-                0,
-                0
-            )
+            if page == 4:
 
-            oled.text(
-                "B" if selected == 1 else " ",
-                8,
-                0
-            )
+                oled.text(
+                    "AB",
+                    0,
+                    0
+                )
+
+            else:
+
+                oled.text(
+                    "A" if selected == 0 else " ",
+                    0,
+                    0
+                )
+
+                oled.text(
+                    "B" if selected == 1 else " ",
+                    8,
+                    0
+                )
 
             oled.text(
                 "P%d" % (page + 1),
@@ -1956,15 +1999,6 @@ while True:
                     0,
                     10
                 )
-
-
-                oled.text(
-                    "A&B",
-                    0,
-                    20
-                )
-
-
         # ====================================================
         # XY DISPLAY
         # ====================================================
