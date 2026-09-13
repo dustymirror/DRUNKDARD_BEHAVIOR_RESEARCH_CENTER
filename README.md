@@ -240,6 +240,8 @@ The two trajectories may therefore:
 - diverge
 - occasionally collide
 
+When in the current mode, it is advisable to set the ‘link’ value extremely low; otherwise, the dunkards are likely to end up in a prolonged pair-dance manoeuvre. However, you can also do this deliberately to turn them into a pair of chaotic trajectory generators.
+
 ---
 
 # 6. Events & Triggers
@@ -761,8 +763,9 @@ Counterpoint 为两个对象建立更强的行为关系。
 - 模仿
 - 偏离
 - 偶发碰撞
-
 ---
+
+当处于当前模式时，建议把link值调得极其低，否则很容易产生长时间的双人舞绕行现象。但你也可以故意为之，让他们成为一对混沌轨迹发生器。
 
 # 6. 事件与 Trigger
 
