@@ -1,13 +1,15 @@
 # ============================================================
 # DRUNKARD
-# #910 v1.46
+# #910 v1.48 autosave&exit
 # ============================================================
 
 from europi import *
+from europi_script import EuroPiScript
 from time import ticks_ms, sleep_ms
+import machine
 import random
 import math
-import machine
+
 
 
 # ============================================================
@@ -785,6 +787,8 @@ class Drunkard:
 # INIT
 # ============================================================
 
+script = EuroPiScript()
+
 alice = Drunkard("A", 1.4, 0.9)
 ben   = Drunkard("B", 1.0, 0.7)
 
@@ -810,7 +814,132 @@ last_k2 = k2.percent()
 
 xrange = 5
 
+# ============================================================
+# LOAD SAVED STATE
+# ============================================================
 
+saved_state = script.load_state_json()
+
+if saved_state:
+
+    alice.xr = saved_state.get(
+        "alice_xr",
+        alice.xr
+    )
+
+    alice.yr = saved_state.get(
+        "alice_yr",
+        alice.yr
+    )
+
+    alice.link = saved_state.get(
+        "alice_link",
+        alice.link
+    )
+
+    alice.mode = saved_state.get(
+        "alice_mode",
+        alice.mode
+    )
+
+    alice.rise = saved_state.get(
+        "alice_rise",
+        alice.rise
+    )
+
+    alice.fall = saved_state.get(
+        "alice_fall",
+        alice.fall
+    )
+
+    alice.quant = saved_state.get(
+        "alice_quant",
+        alice.quant
+    )
+
+
+    ben.xr = saved_state.get(
+        "ben_xr",
+        ben.xr
+    )
+
+    ben.yr = saved_state.get(
+        "ben_yr",
+        ben.yr
+    )
+
+    ben.link = saved_state.get(
+        "ben_link",
+        ben.link
+    )
+
+    ben.mode = saved_state.get(
+        "ben_mode",
+        ben.mode
+    )
+
+    ben.rise = saved_state.get(
+        "ben_rise",
+        ben.rise
+    )
+
+    ben.fall = saved_state.get(
+        "ben_fall",
+        ben.fall
+    )
+
+    ben.quant = saved_state.get(
+        "ben_quant",
+        ben.quant
+    )
+
+
+    xrange = saved_state.get(
+        "xrange",
+        xrange
+    )
+
+
+    selected = saved_state.get(
+        "selected",
+        selected
+    )
+
+    page = saved_state.get(
+        "page",
+        page
+    )
+
+# ============================================================
+# SAVE STATE
+# ============================================================
+
+def save_state():
+
+    script.save_state_json({
+
+        "alice_xr": alice.xr,
+        "alice_yr": alice.yr,
+        "alice_link": alice.link,
+        "alice_mode": alice.mode,
+        "alice_rise": alice.rise,
+        "alice_fall": alice.fall,
+        "alice_quant": alice.quant,
+
+        "ben_xr": ben.xr,
+        "ben_yr": ben.yr,
+        "ben_link": ben.link,
+        "ben_mode": ben.mode,
+        "ben_rise": ben.rise,
+        "ben_fall": ben.fall,
+        "ben_quant": ben.quant,
+
+        "xrange": xrange,
+
+        "selected": selected,
+        "page": page
+    })
+    
 # ============================================================
 # CV STATE
 # ============================================================
@@ -907,18 +1036,13 @@ def next_page():
 # ============================================================
 # EXIT
 # ============================================================
+exit_requested = False
 
 def exit_to_menu():
 
-    # --------------------------------------------------------
-    # IMPORTANT:
-    #
-    # The polling test itself is confirmed to work.
-    # Here we intentionally reset the board after clearing
-    # the script state.
-    #
-    # Bootloader should then return to its menu.
-    # --------------------------------------------------------
+    global exit_requested
+
+    save_state()
 
     oled.fill(0)
 
@@ -931,18 +1055,9 @@ def exit_to_menu():
     oled.show()
 
     sleep_ms(500)
-
-    try:
-
-        reset_state()
-
-    except:
-
-        pass
-
+    
     machine.reset()
-
-
+    
 # ============================================================
 # COMBO PROCESS
 # ============================================================
@@ -1381,6 +1496,9 @@ last_frame = ticks_ms()
 # ============================================================
 
 while True:
+
+    if exit_requested:
+        break
 
     now = ticks_ms()
     
@@ -2059,3 +2177,5 @@ while True:
 
 
         oled.show()
+
+
