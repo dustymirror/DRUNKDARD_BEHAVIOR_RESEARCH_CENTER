@@ -14,7 +14,7 @@
 
 ### An experimental CV instrument for EuroPi
 
-v1.46 updated Sep 13 2026 - Follow Behavior debug 
+v1.48 updated Sep 16 2026 - exiting&saving debuged 
 
 **Drunkard Behavior Research Center** is an experimental generative CV instrument for **EuroPi**.
 
@@ -453,6 +453,7 @@ lib/
 ```
 
 Register the script with the EuroPi Menu if required by your installation.
+["DRUNKARD",         "contrib.drunkard.DrunkardScript"],
 
 The program can then be launched from the EuroPi Menu.
 
@@ -972,6 +973,7 @@ lib/
 ```
 
 根据你的 EuroPi 安装方式，将程序加入 EuroPi Menu。
+["DRUNKARD",         "contrib.drunkard.DrunkardScript"],
 
 之后即可从 EuroPi Menu 启动。
 
