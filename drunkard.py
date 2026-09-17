@@ -1,6 +1,6 @@
 # ============================================================
 # DRUNKARD
-# #910 v1.48 autosave&exit
+# #910 v1.49
 # ============================================================
 
 from europi import *
@@ -784,407 +784,6 @@ class Drunkard:
 
 
 # ============================================================
-# INIT
-# ============================================================
-
-script = EuroPiScript()
-
-alice = Drunkard("A", 1.4, 0.9)
-ben   = Drunkard("B", 1.0, 0.7)
-
-drunks = [alice, ben]
-selected = 0
-
-page = 0
-
-PAGE_COUNT = 5
-
-pickup1 = False
-pickup2 = False
-
-pickup_wait1 = True
-pickup_wait2 = True
-
-last_k1 = k1.percent()
-last_k2 = k2.percent()
-
-# ============================================================
-# X RANGE
-# ============================================================
-
-xrange = 5
-
-# ============================================================
-# LOAD SAVED STATE
-# ============================================================
-
-saved_state = script.load_state_json()
-
-if saved_state:
-
-    alice.xr = saved_state.get(
-        "alice_xr",
-        alice.xr
-    )
-
-    alice.yr = saved_state.get(
-        "alice_yr",
-        alice.yr
-    )
-
-    alice.link = saved_state.get(
-        "alice_link",
-        alice.link
-    )
-
-    alice.mode = saved_state.get(
-        "alice_mode",
-        alice.mode
-    )
-
-    alice.rise = saved_state.get(
-        "alice_rise",
-        alice.rise
-    )
-
-    alice.fall = saved_state.get(
-        "alice_fall",
-        alice.fall
-    )
-
-    alice.quant = saved_state.get(
-        "alice_quant",
-        alice.quant
-    )
-
-
-    ben.xr = saved_state.get(
-        "ben_xr",
-        ben.xr
-    )
-
-    ben.yr = saved_state.get(
-        "ben_yr",
-        ben.yr
-    )
-
-    ben.link = saved_state.get(
-        "ben_link",
-        ben.link
-    )
-
-    ben.mode = saved_state.get(
-        "ben_mode",
-        ben.mode
-    )
-
-    ben.rise = saved_state.get(
-        "ben_rise",
-        ben.rise
-    )
-
-    ben.fall = saved_state.get(
-        "ben_fall",
-        ben.fall
-    )
-
-    ben.quant = saved_state.get(
-        "ben_quant",
-        ben.quant
-    )
-
-
-    xrange = saved_state.get(
-        "xrange",
-        xrange
-    )
-
-
-    selected = saved_state.get(
-        "selected",
-        selected
-    )
-
-    page = saved_state.get(
-        "page",
-        page
-    )
-
-# ============================================================
-# SAVE STATE
-# ============================================================
-
-def save_state():
-
-    script.save_state_json({
-
-        "alice_xr": alice.xr,
-        "alice_yr": alice.yr,
-        "alice_link": alice.link,
-        "alice_mode": alice.mode,
-        "alice_rise": alice.rise,
-        "alice_fall": alice.fall,
-        "alice_quant": alice.quant,
-
-        "ben_xr": ben.xr,
-        "ben_yr": ben.yr,
-        "ben_link": ben.link,
-        "ben_mode": ben.mode,
-        "ben_rise": ben.rise,
-        "ben_fall": ben.fall,
-        "ben_quant": ben.quant,
-
-        "xrange": xrange,
-
-        "selected": selected,
-        "page": page
-    })
-    
-# ============================================================
-# CV STATE
-# ============================================================
-
-a_cvx = 0.0
-a_cvy = 0.0
-
-b_cvx = 0.0
-b_cvy = 0.0
-
-
-a_cvx_initialized = False
-a_cvy_initialized = False
-
-b_cvx_initialized = False
-b_cvy_initialized = False
-
-
-# ============================================================
-# UI STATE
-# ============================================================
-
-last_ui_activity = ticks_ms()
-
-ui_visible = True
-
-last_k1v = k1.percent()
-last_k2v = k2.percent()
-
-
-# ============================================================
-# BUTTON POLLING STATE
-# ============================================================
-
-last_b1 = 0
-last_b2 = 0
-
-b1_pending = False
-b2_pending = False
-
-b1_pending_time = 0
-b2_pending_time = 0
-
-combo_active = False
-combo_fired = False
-combo_start = 0
-
-
-# ============================================================
-# BUTTON ACTIONS
-# ============================================================
-def next_drunk():
-    global selected
-    global pickup1, pickup2
-    global pickup_wait1, pickup_wait2
-    global last_k1, last_k2
-    global last_ui_activity
-
-    selected = (selected + 1) % 2
-
-    pickup1 = False
-    pickup2 = False
-
-    pickup_wait1 = True
-    pickup_wait2 = True
-
-    last_k1 = k1.percent()
-    last_k2 = k2.percent()
-
-    last_ui_activity = ticks_ms()
-
-
-def next_page():
-    global page
-    global pickup1, pickup2
-    global pickup_wait1, pickup_wait2
-    global last_k1, last_k2
-    global last_ui_activity
-
-    page = (page + 1) % PAGE_COUNT
-
-    pickup1 = False
-    pickup2 = False
-
-    pickup_wait1 = True
-    pickup_wait2 = True
-
-    last_k1 = k1.percent()
-    last_k2 = k2.percent()
-
-    last_ui_activity = ticks_ms()
-
-
-# ============================================================
-# EXIT
-# ============================================================
-exit_requested = False
-
-def exit_to_menu():
-
-    global exit_requested
-
-    save_state()
-
-    oled.fill(0)
-
-    oled.text(
-        "exiting...",
-        30,
-        16
-    )
-
-    oled.show()
-
-    sleep_ms(500)
-    
-    machine.reset()
-    
-# ============================================================
-# COMBO PROCESS
-# ============================================================
-
-def process_buttons(now):
-
-    global last_b1
-    global last_b2
-
-    global b1_pending
-    global b2_pending
-
-    global b1_pending_time
-    global b2_pending_time
-
-    global combo_active
-    global combo_fired
-    global combo_start
-
-    b1_now = b1.value()
-    b2_now = b2.value()
-
-
-    # ========================================================
-    # BOTH PRESSED
-    # ========================================================
-
-    if b1_now and b2_now:
-
-        if not combo_active:
-
-            combo_active = True
-            combo_fired = False
-            combo_start = now
-
-        if (
-            not combo_fired
-            and
-            now - combo_start >= COMBO_HOLD
-        ):
-
-            combo_fired = True
-
-            b1_pending = False
-            b2_pending = False
-
-            exit_to_menu()
-
-        return
-
-
-    # ========================================================
-    # BOTH RELEASED
-    # ========================================================
-
-    if not b1_now and not b2_now:
-
-        combo_active = False
-        combo_fired = False
-
-
-    # ========================================================
-    # NEW B1 PRESS
-    # ========================================================
-
-    if b1_now and not last_b1:
-
-        b1_pending = True
-        b1_pending_time = now
-
-
-    # ========================================================
-    # NEW B2 PRESS
-    # ========================================================
-
-    if b2_now and not last_b2:
-
-        b2_pending = True
-        b2_pending_time = now
-
-
-    # ========================================================
-    # B1 PENDING
-    # ========================================================
-
-    if b1_pending:
-
-        # another button appeared
-        if b2_now:
-
-            b1_pending = False
-
-        elif (
-            now - b1_pending_time
-            >= SINGLE_DELAY
-        ):
-
-            next_drunk()
-
-            b1_pending = False
-
-
-    # ========================================================
-    # B2 PENDING
-    # ========================================================
-
-    if b2_pending:
-
-        if b1_now:
-
-            b2_pending = False
-
-        elif (
-            now - b2_pending_time
-            >= SINGLE_DELAY
-        ):
-
-            next_page()
-
-            b2_pending = False
-
-
-    last_b1 = b1_now
-    last_b2 = b2_now
-
-
-# ============================================================
 # QUANTIZER
 # ============================================================
 
@@ -1431,751 +1030,1170 @@ def slew_value(
 
 
 # ============================================================
-# SPLASH
+# DRUNKARD SCRIPT
 # ============================================================
 
-oled.fill(0)
+class DrunkardScript(EuroPiScript):
 
-oled.text(
-    "DRUNKARD",
-    30,
-    4
-)
+    def main(self):
 
-oled.text(
-    "BEHAVIOR",
-    30,
-    12
-)
+        # ====================================================
+        # INIT
+        # ====================================================
 
-oled.text(
-    "RESEARCH CENTER",
-    6,
-    20
-)
+        alice = Drunkard("A", 1.4, 0.9)
+        ben   = Drunkard("B", 1.0, 0.7)
 
-oled.show()
+        drunks = [alice, ben]
+        selected = 0
 
-sleep_ms(3200)
+        page = 0
 
-oled.fill(0)
+        PAGE_COUNT = 5
 
-oled.text(
-    "Dusty Mirror",
-    25,
-    12
-)
+        pickup1 = False
+        pickup2 = False
 
-oled.text(
-    "2026",
-    55,
-    22
-)
+        pickup_wait1 = True
+        pickup_wait2 = True
 
-oled.show()
+        last_k1 = k1.percent()
+        last_k2 = k2.percent()
 
-sleep_ms(1000)
+        # ====================================================
+        # X RANGE
+        # ====================================================
+
+        xrange = 5
+
+        # ====================================================
+        # LOAD SAVED STATE
+        # ====================================================
+
+        saved_state = self.load_state_json()
+
+        if saved_state:
+
+            alice.xr = saved_state.get(
+                "alice_xr",
+                alice.xr
+            )
+
+            alice.yr = saved_state.get(
+                "alice_yr",
+                alice.yr
+            )
+
+            alice.link = saved_state.get(
+                "alice_link",
+                alice.link
+            )
+
+            alice.mode = saved_state.get(
+                "alice_mode",
+                alice.mode
+            )
+
+            alice.rise = saved_state.get(
+                "alice_rise",
+                alice.rise
+            )
+
+            alice.fall = saved_state.get(
+                "alice_fall",
+                alice.fall
+            )
+
+            alice.quant = saved_state.get(
+                "alice_quant",
+                alice.quant
+            )
 
 
-# ============================================================
-# LOOP TIMERS
-# ============================================================
+            ben.xr = saved_state.get(
+                "ben_xr",
+                ben.xr
+            )
 
-next_step = (
-    ticks_ms() +
-    random.randint(
-        STEP_MIN,
-        STEP_MAX
-    )
-)
+            ben.yr = saved_state.get(
+                "ben_yr",
+                ben.yr
+            )
 
-last_frame = ticks_ms()
+            ben.link = saved_state.get(
+                "ben_link",
+                ben.link
+            )
 
-# ============================================================
-# MAIN LOOP
-# ============================================================
+            ben.mode = saved_state.get(
+                "ben_mode",
+                ben.mode
+            )
 
-while True:
+            ben.rise = saved_state.get(
+                "ben_rise",
+                ben.rise
+            )
 
-    if exit_requested:
-        break
+            ben.fall = saved_state.get(
+                "ben_fall",
+                ben.fall
+            )
 
-    now = ticks_ms()
-    
-    process_buttons(now)
-    
-    current = drunks[selected]
+            ben.quant = saved_state.get(
+                "ben_quant",
+                ben.quant
+            )
 
-    k1v = k1.percent()
-    k2v = k2.percent()
 
-    # -------------------------
-    # PICKUP ARM
-    # -------------------------
+            xrange = saved_state.get(
+                "xrange",
+                xrange
+            )
 
-    if abs(k1v - last_k1) > 0.01:
-        pickup_wait1 = False
 
-    if abs(k2v - last_k2) > 0.01:
-        pickup_wait2 = False
+            selected = saved_state.get(
+                "selected",
+                selected
+            )
 
-    last_k1 = k1v
-    last_k2 = k2v
+            page = saved_state.get(
+                "page",
+                page
+            )
 
-    # --------------------------------------------------------
-    # UI activity
-    # --------------------------------------------------------
+        # ====================================================
+        # SAVE STATE
+        # ====================================================
 
-    if (
-        abs(k1v - last_k1v) > 0.005
-        or
-        abs(k2v - last_k2v) > 0.005
-    ):
+        def save_state():
 
-        last_ui_activity = now
+            self.save_state_json({
+
+                "alice_xr": alice.xr,
+                "alice_yr": alice.yr,
+                "alice_link": alice.link,
+                "alice_mode": alice.mode,
+                "alice_rise": alice.rise,
+                "alice_fall": alice.fall,
+                "alice_quant": alice.quant,
+
+                "ben_xr": ben.xr,
+                "ben_yr": ben.yr,
+                "ben_link": ben.link,
+                "ben_mode": ben.mode,
+                "ben_rise": ben.rise,
+                "ben_fall": ben.fall,
+                "ben_quant": ben.quant,
+
+                "xrange": xrange,
+
+                "selected": selected,
+                "page": page
+            })
+
+        # ====================================================
+        # CV STATE
+        # ====================================================
+
+        a_cvx = 0.0
+        a_cvy = 0.0
+
+        b_cvx = 0.0
+        b_cvy = 0.0
+
+
+        a_cvx_initialized = False
+        a_cvy_initialized = False
+
+        b_cvx_initialized = False
+        b_cvy_initialized = False
+
+
+        # ====================================================
+        # UI STATE
+        # ====================================================
+
+        last_ui_activity = ticks_ms()
+
         ui_visible = True
 
-
-    last_k1v = k1v
-    last_k2v = k2v
-
-
-    # --------------------------------------------------------
-    # page parameters
-    # --------------------------------------------------------
-
-    if page == 0:
-
-        p1 = current.xr / 9.9
-        p2 = current.yr / 9.9
+        last_k1v = k1.percent()
+        last_k2v = k2.percent()
 
 
-    elif page == 1:
+        # ====================================================
+        # BUTTON POLLING STATE
+        # ====================================================
 
-        p1 = current.link
+        last_b1 = 0
+        last_b2 = 0
 
-        p2 = current.mode / 2.0
+        b1_pending = False
+        b2_pending = False
 
+        b1_pending_time = 0
+        b2_pending_time = 0
 
-    elif page == 2:
-
-        p1 = (
-            current.rise - 0.02
-        ) / 0.48
-
-        p2 = (
-            current.fall - 0.02
-        ) / 0.48
-
-
-    elif page == 3:
-
-        p1 = current.quant / 10.0
-
-        p2 = 0
+        combo_active = False
+        combo_fired = False
+        combo_start = 0
 
 
-    else:
+        # ====================================================
+        # BUTTON ACTIONS
+        # ====================================================
 
-        p1 = (
-            xrange - 1
-        ) / 4.0
+        def next_drunk():
 
-        p2 = 0
+            nonlocal selected
+            nonlocal pickup1, pickup2
+            nonlocal pickup_wait1, pickup_wait2
+            nonlocal last_k1, last_k2
+            nonlocal last_ui_activity
 
+            selected = (selected + 1) % 2
 
-    # ========================================================
-    # PICKUP
-    # ========================================================
+            pickup1 = False
+            pickup2 = False
 
-    if not pickup1 and not pickup_wait1:
+            pickup_wait1 = True
+            pickup_wait2 = True
 
-        if abs(k1v - p1) < 0.03:
+            last_k1 = k1.percent()
+            last_k2 = k2.percent()
 
-            pickup1 = True
-
-
-    if not pickup2 and not pickup_wait2:
-
-        if abs(k2v - p2) < 0.03:
-
-            pickup2 = True
+            last_ui_activity = ticks_ms()
 
 
-    # ========================================================
-    # PARAMETERS
-    # ========================================================
+        def next_page():
 
-    if page == 0:
+            nonlocal page
+            nonlocal pickup1, pickup2
+            nonlocal pickup_wait1, pickup_wait2
+            nonlocal last_k1, last_k2
+            nonlocal last_ui_activity
 
-        if pickup1:
+            page = (page + 1) % PAGE_COUNT
 
-            current.xr = (
-                k1v * 9.9
+            pickup1 = False
+            pickup2 = False
+
+            pickup_wait1 = True
+            pickup_wait2 = True
+
+            last_k1 = k1.percent()
+            last_k2 = k2.percent()
+
+            last_ui_activity = ticks_ms()
+
+
+        # ====================================================
+        # EXIT
+        # ====================================================
+
+        exit_requested = False
+
+        def exit_to_menu():
+
+            nonlocal exit_requested
+
+            save_state()
+
+            oled.fill(0)
+
+            oled.text(
+                "exiting...",
+                30,
+                16
             )
 
-        if pickup2:
+            oled.show()
 
-            current.yr = (
-                k2v * 9.9
-            )
+            sleep_ms(500)
 
-
-    elif page == 1:
-
-        if pickup1:
-
-            current.link = k1v
+            exit_requested = True
 
 
-        if pickup2:
+        # ====================================================
+        # COMBO PROCESS
+        # ====================================================
 
-            current.mode = int(
-                k2v * 2.99
-            )
+        def process_buttons(now):
 
+            nonlocal last_b1
+            nonlocal last_b2
 
-    elif page == 2:
+            nonlocal b1_pending
+            nonlocal b2_pending
 
-        if pickup1:
+            nonlocal b1_pending_time
+            nonlocal b2_pending_time
 
-            current.rise = (
-                0.02 +
-                k1v * 0.48
-            )
+            nonlocal combo_active
+            nonlocal combo_fired
+            nonlocal combo_start
 
-        if pickup2:
-
-            current.fall = (
-                0.02 +
-                k2v * 0.48
-            )
-
-
-    elif page == 3:
-
-        if pickup1:
-
-            current.quant = int(
-                k1v * 10.99
-            )
+            b1_now = b1.value()
+            b2_now = b2.value()
 
 
-    elif page == 4:
+            # ================================================
+            # BOTH PRESSED
+            # ================================================
 
-        if pickup1:
+            if b1_now and b2_now:
 
-            xrange = (
-                1 +
-                int(k1v * 4.99)
-            )
+                if not combo_active:
+
+                    combo_active = True
+                    combo_fired = False
+                    combo_start = now
+
+                if (
+                    not combo_fired
+                    and
+                    now - combo_start >= COMBO_HOLD
+                ):
+
+                    combo_fired = True
+
+                    b1_pending = False
+                    b2_pending = False
+
+                    exit_to_menu()
+
+                return
 
 
-    # ========================================================
-    # STEP
-    # ========================================================
+            # ================================================
+            # BOTH RELEASED
+            # ================================================
 
-    if now >= next_step:
+            if not b1_now and not b2_now:
+
+                combo_active = False
+                combo_fired = False
+
+
+            # ================================================
+            # NEW B1 PRESS
+            # ================================================
+
+            if b1_now and not last_b1:
+
+                b1_pending = True
+                b1_pending_time = now
+
+
+            # ================================================
+            # NEW B2 PRESS
+            # ================================================
+
+            if b2_now and not last_b2:
+
+                b2_pending = True
+                b2_pending_time = now
+
+
+            # ================================================
+            # B1 PENDING
+            # ================================================
+
+            if b1_pending:
+
+                # another button appeared
+                if b2_now:
+
+                    b1_pending = False
+
+                elif (
+                    now - b1_pending_time
+                    >= SINGLE_DELAY
+                ):
+
+                    next_drunk()
+
+                    b1_pending = False
+
+
+            # ================================================
+            # B2 PENDING
+            # ================================================
+
+            if b2_pending:
+
+                if b1_now:
+
+                    b2_pending = False
+
+                elif (
+                    now - b2_pending_time
+                    >= SINGLE_DELAY
+                ):
+
+                    next_page()
+
+                    b2_pending = False
+
+
+            last_b1 = b1_now
+            last_b2 = b2_now
+
+
+        # ====================================================
+        # SPLASH
+        # ====================================================
+
+        oled.fill(0)
+
+        oled.text(
+            "DRUNKARD",
+            30,
+            4
+        )
+
+        oled.text(
+            "BEHAVIOR",
+            30,
+            12
+        )
+
+        oled.text(
+            "RESEARCH CENTER",
+            6,
+            20
+        )
+
+        oled.show()
+
+        sleep_ms(3200)
+
+        oled.fill(0)
+
+        oled.text(
+            "Dusty Mirror",
+            25,
+            12
+        )
+
+        oled.text(
+            "2026",
+            55,
+            22
+        )
+
+        oled.show()
+
+        sleep_ms(1000)
+
+
+        # ====================================================
+        # LOOP TIMERS
+        # ====================================================
 
         next_step = (
-            now +
+            ticks_ms() +
             random.randint(
                 STEP_MIN,
                 STEP_MAX
             )
         )
 
-        alice.macro_step()
-        ben.macro_step()
+        last_frame = ticks_ms()
 
+        # ====================================================
+        # MAIN LOOP
+        # ====================================================
 
-    # ========================================================
-    # COUNTERPOINT
-    # ========================================================
+        while True:
 
-    if alice.mode == MODE_COUNTERPOINT:
+            if exit_requested:
+                break
 
-        alice.cp_x = (
-            WIDTH -
-            ben.x
-        )
+            now = ticks_ms()
 
-        alice.cp_y = (
-            HEIGHT -
-            ben.y
-        )
+            process_buttons(now)
 
-    else:
+            current = drunks[selected]
 
-        alice.cp_x = alice.x
-        alice.cp_y = alice.y
+            k1v = k1.percent()
+            k2v = k2.percent()
 
+            # -------------------------
+            # PICKUP ARM
+            # -------------------------
 
-    if ben.mode == MODE_COUNTERPOINT:
+            if abs(k1v - last_k1) > 0.01:
+                pickup_wait1 = False
 
-        ben.cp_x = (
-            WIDTH -
-            alice.x
-        )
+            if abs(k2v - last_k2) > 0.01:
+                pickup_wait2 = False
 
-        ben.cp_y = (
-            HEIGHT -
-            alice.y
-        )
+            last_k1 = k1v
+            last_k2 = k2v
 
-    else:
+            # --------------------------------------------------------
+            # UI activity
+            # --------------------------------------------------------
 
-        ben.cp_x = ben.x
-        ben.cp_y = ben.y
-
-
-    # ========================================================
-    # COLLISION
-    # ========================================================
-
-    dx = alice.x - ben.x
-    dy = alice.y - ben.y
-
-    dist = math.sqrt(
-        dx * dx +
-        dy * dy
-    )
-
-
-    if dist < 10:
-
-        if gate.allow_collision(now):
-
-            alice.event_collision()
-            ben.event_collision()
-
-
-    # ========================================================
-    # UPDATE
-    # ========================================================
-
-    alice.react_to(ben)
-    ben.react_to(alice)
-
-
-    for d in drunks:
-
-        d.apply_field(drunks)
-
-        d.update_noise()
-
-        wall = d.update()
-
-
-        if wall == "wall":
-
-            if gate.allow_wall(
-                d.name,
-                now
+            if (
+                abs(k1v - last_k1v) > 0.005
+                or
+                abs(k2v - last_k2v) > 0.005
             ):
 
-                d.event_wall()
+                last_ui_activity = now
+                ui_visible = True
 
 
-    # ========================================================
-    # CV TARGETS
-    # ========================================================
+            last_k1v = k1v
+            last_k2v = k2v
 
-    a_target_x = (
-        alice.x /
-        WIDTH
-    ) * xrange
 
+            # --------------------------------------------------------
+            # page parameters
+            # --------------------------------------------------------
 
-    a_target_y = (
-        alice.y /
-        HEIGHT
-    ) * 2.5
+            if page == 0:
 
+                p1 = current.xr / 9.9
+                p2 = current.yr / 9.9
 
-    b_target_x = (
-        ben.x /
-        WIDTH
-    ) * xrange
 
+            elif page == 1:
 
-    b_target_y = (
-        ben.y /
-        HEIGHT
-    ) * 2.5
+                p1 = current.link
 
+                p2 = current.mode / 2.0
 
-    # ========================================================
-    # QUANTIZE
-    # ========================================================
 
-    a_qx = quantize_cv(
-        a_target_x,
-        alice.quant
-    )
+            elif page == 2:
 
-    a_qy = quantize_cv(
-        a_target_y,
-        alice.quant
-    )
+                p1 = (
+                    current.rise - 0.02
+                ) / 0.48
 
-    b_qx = quantize_cv(
-        b_target_x,
-        ben.quant
-    )
+                p2 = (
+                    current.fall - 0.02
+                ) / 0.48
 
-    b_qy = quantize_cv(
-        b_target_y,
-        ben.quant
-    )
 
+            elif page == 3:
 
-    # ========================================================
-    # INITIALIZE CV
-    # ========================================================
+                p1 = current.quant / 10.0
 
-    if not a_cvx_initialized:
+                p2 = 0
 
-        a_cvx = a_qx
 
-        a_cvx_initialized = True
+            else:
 
+                p1 = (
+                    xrange - 1
+                ) / 4.0
 
-    if not a_cvy_initialized:
+                p2 = 0
 
-        a_cvy = a_qy
 
-        a_cvy_initialized = True
+            # ========================================================
+            # PICKUP
+            # ========================================================
 
+            if not pickup1 and not pickup_wait1:
 
-    if not b_cvx_initialized:
+                if abs(k1v - p1) < 0.03:
 
-        b_cvx = b_qx
+                    pickup1 = True
 
-        b_cvx_initialized = True
 
+            if not pickup2 and not pickup_wait2:
 
-    if not b_cvy_initialized:
+                if abs(k2v - p2) < 0.03:
 
-        b_cvy = b_qy
+                    pickup2 = True
 
-        b_cvy_initialized = True
 
+            # ========================================================
+            # PARAMETERS
+            # ========================================================
 
-    # ========================================================
-    # SLEW
-    # ========================================================
+            if page == 0:
 
-    a_cvx = slew_value(
-        a_cvx,
-        a_qx,
-        alice.rise,
-        alice.fall
-    )
+                if pickup1:
 
+                    current.xr = (
+                        k1v * 9.9
+                    )
 
-    a_cvy = slew_value(
-        a_cvy,
-        a_qy,
-        alice.rise,
-        alice.fall
-    )
+                if pickup2:
 
+                    current.yr = (
+                        k2v * 9.9
+                    )
 
-    b_cvx = slew_value(
-        b_cvx,
-        b_qx,
-        ben.rise,
-        ben.fall
-    )
 
+            elif page == 1:
 
-    b_cvy = slew_value(
-        b_cvy,
-        b_qy,
-        ben.rise,
-        ben.fall
-    )
+                if pickup1:
 
+                    current.link = k1v
 
-    # ========================================================
-    # CLAMP
-    # ========================================================
 
-    if a_cvx < 0:
-        a_cvx = 0
+                if pickup2:
 
-    if a_cvx > xrange:
-        a_cvx = xrange
+                    current.mode = int(
+                        k2v * 2.99
+                    )
 
 
-    if b_cvx < 0:
-        b_cvx = 0
+            elif page == 2:
 
-    if b_cvx > xrange:
-        b_cvx = xrange
+                if pickup1:
 
+                    current.rise = (
+                        0.02 +
+                        k1v * 0.48
+                    )
 
-    if a_cvy < 0:
-        a_cvy = 0
+                if pickup2:
 
-    if a_cvy > 2.5:
-        a_cvy = 2.5
+                    current.fall = (
+                        0.02 +
+                        k2v * 0.48
+                    )
 
 
-    if b_cvy < 0:
-        b_cvy = 0
+            elif page == 3:
 
-    if b_cvy > 2.5:
-        b_cvy = 2.5
+                if pickup1:
 
+                    current.quant = int(
+                        k1v * 10.99
+                    )
 
-    # ========================================================
-    # OUTPUT
-    # ========================================================
 
-    cv1.voltage(a_cvx)
-    cv2.voltage(a_cvy)
+            elif page == 4:
 
-    cv4.voltage(b_cvx)
-    cv5.voltage(b_cvy)
+                if pickup1:
 
+                    xrange = (
+                        1 +
+                        int(k1v * 4.99)
+                    )
 
-    # ========================================================
-    # UI AUTO HIDE
-    # ========================================================
 
-    if now - last_ui_activity > UI_TIMEOUT:
+            # ========================================================
+            # STEP
+            # ========================================================
 
-        ui_visible = False
+            if now >= next_step:
 
+                next_step = (
+                    now +
+                    random.randint(
+                        STEP_MIN,
+                        STEP_MAX
+                    )
+                )
 
-    # ========================================================
-    # OLED
-    # ========================================================
+                alice.macro_step()
+                ben.macro_step()
 
-    if now - last_frame >= FRAME_INTERVAL:
 
-        last_frame = now
+            # ========================================================
+            # COUNTERPOINT
+            # ========================================================
 
-        oled.fill(0)
+            if alice.mode == MODE_COUNTERPOINT:
 
+                alice.cp_x = (
+                    WIDTH -
+                    ben.x
+                )
 
-        # ----------------------------------------------------
-        # parameter UI
-        # ----------------------------------------------------
-
-        if ui_visible:
-
-            if page == 4:
-
-                oled.text(
-                    "AB",
-                    0,
-                    0
+                alice.cp_y = (
+                    HEIGHT -
+                    ben.y
                 )
 
             else:
 
-                oled.text(
-                    "A" if selected == 0 else " ",
-                    0,
-                    0
+                alice.cp_x = alice.x
+                alice.cp_y = alice.y
+
+
+            if ben.mode == MODE_COUNTERPOINT:
+
+                ben.cp_x = (
+                    WIDTH -
+                    alice.x
                 )
 
-                oled.text(
-                    "B" if selected == 1 else " ",
-                    8,
-                    0
+                ben.cp_y = (
+                    HEIGHT -
+                    alice.y
                 )
 
-            oled.text(
-                "P%d" % (page + 1),
-                20,
-                0
+            else:
+
+                ben.cp_x = ben.x
+                ben.cp_y = ben.y
+
+
+            # ========================================================
+            # COLLISION
+            # ========================================================
+
+            dx = alice.x - ben.x
+            dy = alice.y - ben.y
+
+            dist = math.sqrt(
+                dx * dx +
+                dy * dy
             )
 
 
-            # --------------------------------------------
-            # PAGE 1
-            # --------------------------------------------
+            if dist < 10:
 
-            if page == 0:
+                if gate.allow_collision(now):
 
-                oled.text(
-                    "XR%s %.1f" %
-                    (
-                        "*" if not pickup1 else "",
-                        current.xr
-                    ),
-                    0,
-                    10
-                )
-
-                oled.text(
-                    "YR%s %.1f" %
-                    (
-                        "*" if not pickup2 else "",
-                        current.yr
-                    ),
-                    0,
-                    20
-                )
+                    alice.event_collision()
+                    ben.event_collision()
 
 
-            # --------------------------------------------
-            # PAGE 2
-            # --------------------------------------------
+            # ========================================================
+            # UPDATE
+            # ========================================================
 
-            elif page == 1:
-
-                oled.text(
-                    "LK%s %.3f" %
-                    (
-                        "*" if not pickup1 else "",
-                        current.link
-                    ),
-                    0,
-                    10
-                )
+            alice.react_to(ben)
+            ben.react_to(alice)
 
 
-                mode_name = [
-                    "W",
-                    "P",
-                    "C"
-                ][current.mode]
+            for d in drunks:
+
+                d.apply_field(drunks)
+
+                d.update_noise()
+
+                wall = d.update()
 
 
-                oled.text(
-                    "MD%s %s" %
-                    (
-                        "*" if not pickup2 else "",
-                        mode_name
-                    ),
-                    0,
-                    20
-                )
+                if wall == "wall":
+
+                    if gate.allow_wall(
+                        d.name,
+                        now
+                    ):
+
+                        d.event_wall()
 
 
-            # --------------------------------------------
-            # PAGE 3
-            # --------------------------------------------
+            # ========================================================
+            # CV TARGETS
+            # ========================================================
 
-            elif page == 2:
-
-                oled.text(
-                    "RI%s %.2f" %
-                    (
-                        "*" if not pickup1 else "",
-                        current.rise
-                    ),
-                    0,
-                    10
-                )
-
-                oled.text(
-                    "FA%s %.2f" %
-                    (
-                        "*" if not pickup2 else "",
-                        current.fall
-                    ),
-                    0,
-                    20
-                )
+            a_target_x = (
+                alice.x /
+                WIDTH
+            ) * xrange
 
 
-            # --------------------------------------------
-            # PAGE 4
-            # --------------------------------------------
-
-            elif page == 3:
-
-                oled.text(
-                    "QT%s %s" %
-                    (
-                        "*" if not pickup1 else "",
-                        QNAMES[current.quant]
-                    ),
-                    0,
-                    10
-                )
+            a_target_y = (
+                alice.y /
+                HEIGHT
+            ) * 2.5
 
 
-            # --------------------------------------------
-            # PAGE 5
-            # --------------------------------------------
-
-            elif page == 4:
-
-                oled.text(
-                    "XO%s %d-OCT" %
-                    (
-                        "*" if not pickup1 else "",
-                        xrange
-                    ),
-                    0,
-                    10
-                )
-        # ====================================================
-        # XY DISPLAY
-        # ====================================================
-
-        try:
-
-            ax = int(alice.x)
-            ay = int(alice.y)
-
-        except:
-
-            ax = WIDTH // 2
-            ay = HEIGHT // 2
+            b_target_x = (
+                ben.x /
+                WIDTH
+            ) * xrange
 
 
-        try:
-
-            bx = int(ben.x)
-            by = int(ben.y)
-
-        except:
-
-            bx = WIDTH // 2
-            by = HEIGHT // 2
+            b_target_y = (
+                ben.y /
+                HEIGHT
+            ) * 2.5
 
 
-        # ----------------------------------------------------
-        # A
-        # ----------------------------------------------------
+            # ========================================================
+            # QUANTIZE
+            # ========================================================
 
-        if (
-            -4 < ax < WIDTH
-            and
-            -8 < ay < HEIGHT
-        ):
-
-            oled.text(
-                "A",
-                ax,
-                ay
+            a_qx = quantize_cv(
+                a_target_x,
+                alice.quant
             )
 
-        # ----------------------------------------------------
-        # B
-        # ----------------------------------------------------
+            a_qy = quantize_cv(
+                a_target_y,
+                alice.quant
+            )
 
-        if (
-            -4 < bx < WIDTH
-            and
-            -8 < by < HEIGHT
-        ):
+            b_qx = quantize_cv(
+                b_target_x,
+                ben.quant
+            )
 
-            oled.text(
-                "B",
-                bx,
-                by
+            b_qy = quantize_cv(
+                b_target_y,
+                ben.quant
             )
 
 
-        oled.show()
+            # ========================================================
+            # INITIALIZE CV
+            # ========================================================
+
+            if not a_cvx_initialized:
+
+                a_cvx = a_qx
+
+                a_cvx_initialized = True
 
 
+            if not a_cvy_initialized:
+
+                a_cvy = a_qy
+
+                a_cvy_initialized = True
+
+
+            if not b_cvx_initialized:
+
+                b_cvx = b_qx
+
+                b_cvx_initialized = True
+
+
+            if not b_cvy_initialized:
+
+                b_cvy = b_qy
+
+                b_cvy_initialized = True
+
+
+            # ========================================================
+            # SLEW
+            # ========================================================
+
+            a_cvx = slew_value(
+                a_cvx,
+                a_qx,
+                alice.rise,
+                alice.fall
+            )
+
+
+            a_cvy = slew_value(
+                a_cvy,
+                a_qy,
+                alice.rise,
+                alice.fall
+            )
+
+
+            b_cvx = slew_value(
+                b_cvx,
+                b_qx,
+                ben.rise,
+                ben.fall
+            )
+
+
+            b_cvy = slew_value(
+                b_cvy,
+                b_qy,
+                ben.rise,
+                ben.fall
+            )
+
+
+            # ========================================================
+            # CLAMP
+            # ========================================================
+
+            if a_cvx < 0:
+                a_cvx = 0
+
+            if a_cvx > xrange:
+                a_cvx = xrange
+
+
+            if b_cvx < 0:
+                b_cvx = 0
+
+            if b_cvx > xrange:
+                b_cvx = xrange
+
+
+            if a_cvy < 0:
+                a_cvy = 0
+
+            if a_cvy > 2.5:
+                a_cvy = 2.5
+
+
+            if b_cvy < 0:
+                b_cvy = 0
+
+            if b_cvy > 2.5:
+                b_cvy = 2.5
+
+
+            # ========================================================
+            # OUTPUT
+            # ========================================================
+
+            cv1.voltage(a_cvx)
+            cv2.voltage(a_cvy)
+
+            cv4.voltage(b_cvx)
+            cv5.voltage(b_cvy)
+
+
+            # ========================================================
+            # UI AUTO HIDE
+            # ========================================================
+
+            if now - last_ui_activity > UI_TIMEOUT:
+
+                ui_visible = False
+
+
+            # ========================================================
+            # OLED
+            # ========================================================
+
+            if now - last_frame >= FRAME_INTERVAL:
+
+                last_frame = now
+
+                oled.fill(0)
+
+
+                # ----------------------------------------------------
+                # parameter UI
+                # ----------------------------------------------------
+
+                if ui_visible:
+
+                    if page == 4:
+
+                        oled.text(
+                            "AB",
+                            0,
+                            0
+                        )
+
+                    else:
+
+                        oled.text(
+                            "A" if selected == 0 else " ",
+                            0,
+                            0
+                        )
+
+                        oled.text(
+                            "B" if selected == 1 else " ",
+                            8,
+                            0
+                        )
+
+                    oled.text(
+                        "P%d" % (page + 1),
+                        20,
+                        0
+                    )
+
+
+                    # --------------------------------------------
+                    # PAGE 1
+                    # --------------------------------------------
+
+                    if page == 0:
+
+                        oled.text(
+                            "XR%s %.1f" %
+                            (
+                                "*" if not pickup1 else "",
+                                current.xr
+                            ),
+                            0,
+                            10
+                        )
+
+                        oled.text(
+                            "YR%s %.1f" %
+                            (
+                                "*" if not pickup2 else "",
+                                current.yr
+                            ),
+                            0,
+                            20
+                        )
+
+
+                    # --------------------------------------------
+                    # PAGE 2
+                    # --------------------------------------------
+
+                    elif page == 1:
+
+                        oled.text(
+                            "LK%s %.3f" %
+                            (
+                                "*" if not pickup1 else "",
+                                current.link
+                            ),
+                            0,
+                            10
+                        )
+
+
+                        mode_name = [
+                            "W",
+                            "P",
+                            "C"
+                        ][current.mode]
+
+
+                        oled.text(
+                            "MD%s %s" %
+                            (
+                                "*" if not pickup2 else "",
+                                mode_name
+                            ),
+                            0,
+                            20
+                        )
+
+
+                    # --------------------------------------------
+                    # PAGE 3
+                    # --------------------------------------------
+
+                    elif page == 2:
+
+                        oled.text(
+                            "RI%s %.2f" %
+                            (
+                                "*" if not pickup1 else "",
+                                current.rise
+                            ),
+                            0,
+                            10
+                        )
+
+                        oled.text(
+                            "FA%s %.2f" %
+                            (
+                                "*" if not pickup2 else "",
+                                current.fall
+                            ),
+                            0,
+                            20
+                        )
+
+
+                    # --------------------------------------------
+                    # PAGE 4
+                    # --------------------------------------------
+
+                    elif page == 3:
+
+                        oled.text(
+                            "QT%s %s" %
+                            (
+                                "*" if not pickup1 else "",
+                                QNAMES[current.quant]
+                            ),
+                            0,
+                            10
+                        )
+
+
+                    # --------------------------------------------
+                    # PAGE 5
+                    # --------------------------------------------
+
+                    elif page == 4:
+
+                        oled.text(
+                            "XO%s %d-OCT" %
+                            (
+                                "*" if not pickup1 else "",
+                                xrange
+                            ),
+                            0,
+                            10
+                        )
+                # ====================================================
+                # XY DISPLAY
+                # ====================================================
+
+                try:
+
+                    ax = int(alice.x)
+                    ay = int(alice.y)
+
+                except:
+
+                    ax = WIDTH // 2
+                    ay = HEIGHT // 2
+
+
+                try:
+
+                    bx = int(ben.x)
+                    by = int(ben.y)
+
+                except:
+
+                    bx = WIDTH // 2
+                    by = HEIGHT // 2
+
+
+                # ----------------------------------------------------
+                # A
+                # ----------------------------------------------------
+
+                if (
+                    -4 < ax < WIDTH
+                    and
+                    -8 < ay < HEIGHT
+                ):
+
+                    oled.text(
+                        "A",
+                        ax,
+                        ay
+                    )
+
+                # ----------------------------------------------------
+                # B
+                # ----------------------------------------------------
+
+                if (
+                    -4 < bx < WIDTH
+                    and
+                    -8 < by < HEIGHT
+                ):
+
+                    oled.text(
+                        "B",
+                        bx,
+                        by
+                    )
+
+
+                oled.show()
+
+
+# ============================================================
+# ENTRY POINT
+# ============================================================
+
+if __name__ == "__main__":
+    script = DrunkardScript()
+    script.main()
