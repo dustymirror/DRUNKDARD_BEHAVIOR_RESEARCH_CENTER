@@ -14,7 +14,7 @@
 
 ### An experimental CV instrument for EuroPi
 
-v1.48 updated Sep 16 2026 - exiting&saving debuged 
+v1.49 updated Sep 18 2026 - exiting & saving debugged 
 
 **Drunkard Behavior Research Center** is an experimental generative CV instrument for **EuroPi**.
 
